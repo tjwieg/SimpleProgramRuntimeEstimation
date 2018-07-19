@@ -24,41 +24,9 @@
    <br/>
   </p>
   <br/>
-  The amount of the bar that is filled is usually expressed as a proportion, such as
-  <code>
-   0.4
-  </code>
-  . We could also call this
-  <code>
-   40%
-  </code>
-  , or in the general case,
-  <code>
-   x%
-  </code>
-  . When the task is complete, the bar is completely full:
-  <code>
-   1.0
-  </code>
-  or
-  <code>
-   100%
-  </code>
-  .
+  The amount of the bar that is filled is usually expressed as a proportion, such as \(0.4\). We could also call this \(40\%\), or in the general case, \(x\%\). When the task is complete, the bar is completely full: \(1.0\) or \(100\%\).
   <p>
-   To estimate how long it will take to completely fill the bar, we need to know how quickly the bar is filling up. The easiest way to do that is to measure how full the bar is (
-   <code>
-    x%
-   </code>
-   ) and how long it has taken to fill that much up (say,
-   <code>
-    10 minutes
-   </code>
-   , or in the general case,
-   <code>
-    y
-   </code>
-   minutes). Divide those two numbers to get the loading rate:
+   To estimate how long it will take to completely fill the bar, we need to know how quickly the bar is filling up. The easiest way to do that is to measure how full the bar is (\(x\%\)) and how long it has taken to fill that much up (say, \(10 \text{ minutes}\), or in the general case, \(y \text{ minutes}\)). Divide those two numbers to get the loading rate:
    <br/>
   </p>
   <p align="center">
@@ -69,11 +37,7 @@
    \)
   </p>
   <p>
-   If we make a simple proportion, we can estimate
-   <code>
-    z
-   </code>
-   , the total time it takes for the task to complete:
+   If we make a simple proportion, we can estimate \(z\), the total time it takes for the task to complete:
    <br/>
   </p>
   <p align="center">
@@ -94,39 +58,39 @@
    \)
   </p>
   <br/>
-  Therefore,
-  <code>
-   y/x
-  </code>
-  is an estimate of the total time to compute. To estimate the
+  Therefore, \(y/x\) is an estimate of the total time to compute. To estimate the
   <strong>
    remaining
   </strong>
-  time, all we need to do is subtract the amount of time that has already run… which we already know as
-  <code>
-   y
-  </code>
-  .
+  time, all we need to do is subtract the amount of time that has already run… which we already know as \(y\).
   <p>
    Here’s an example of this algorithm written in R:
   </p>
-  <pre><code class="r">x &lt;- proportionComplete
- # The current index of a `for` loop divided by the length of the loop, etc.
-y &lt;- Sys.time() - startTime
- # Find the difference between the time the task started and the current time.
- # Note that `Sys.time()` automatically selects an appropriate unit
-timeRemaining &lt;- (y/x) - y
+  <pre><code class="r">timeRemaining &lt;- as.list(rep(NA, times = 10)) # Preallocating a list
 
- # An example of how to output this data to the console.
- # `\r` causes `cat` to overwrite the line (prevent cluttering the screen)
- # `\b` does a "backspace" (so there's no gap between "x" and "%")
-cat("\r", sprintf(fmt = "%.02f", 100*x), "\b%",
-    "Estimate", signif(timeRemaining, digits = 3),
-    attr(y, "units"), "remaining...")
-    # The call to `attr` gets the current units ("seconds", "minutes", etc.)
+for (i in 1:length(thingsToDo)) {
+    myData[i] &lt;- slowFunctionDoingSomethingUseful(var1, var2)
+    # This is the code that does what you're actually trying to do
 
- # I recommend using a rolling average of the past few `timeRemaining`s;
- # That should smooth out the variability in the estimate.
+    x &lt;- i/length(thingsToDo) # Proportion of the job that's already complete
+    y &lt;- Sys.time() - startTime
+    # y is the difference between the time the task started and the current time.
+    # Note that `Sys.time()` automatically selects an appropriate unit
+
+    timeRemaining[[(i %% 10) + 1]] &lt;- (y/x) - y # +1 prevents index 0
+    meanTimeRemaining &lt;- mean(unlist(timeRemaining), na.rm = TRUE)
+    # I'm using a rolling average of the past few `timeRemaining`s;
+    # that's just to smooth out the variability in the estimate.
+
+    # An example of how to output this data to the console.
+    # `\r` causes `cat` to overwrite itself each time (keep stationary)
+    # `\b` does a "backspace" (so there's no gap between "x" and "%")
+    cat("\r", sprintf(fmt = "%.02f", 100*x), "\b%",
+        "Estimate", signif(meanTimeRemaining, digits = 3),
+        attr(y, "units"), "remaining...")
+    # The call to `attr` gets the current units ("sec", "min", etc.)
+
+} cat(\n) # So anything printed later is on it's own line
 </code></pre>
   <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.1/highlight.min.js">
   </script>
